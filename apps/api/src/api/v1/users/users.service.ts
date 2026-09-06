@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { Prisma } from "@/generated/prisma";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/app-error";
 import { CreateUserInput, STAFF_ROLES, UpdateUserInput, UpdateUserStatusInput } from "./users.validation";

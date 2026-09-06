@@ -1,5 +1,5 @@
 import { prisma } from "./prisma";
-import { MessageTemplateCategory } from "@/generated/prisma";
+import { MessageTemplateCategory } from "@prisma/client";
 
 const DEFAULT_BODIES: Record<"ABSENCE" | "FEE_REMINDER" | "FEE_OVERDUE", { name: string; body: string }> = {
   ABSENCE: {

@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 import { AppError } from "./app-error";
-import { NotificationTriggerType } from "@/generated/prisma";
+import { NotificationTriggerType } from "@prisma/client";
 
 const DEFAULT_WINDOW = { commsWindowStart: "07:00", commsWindowEnd: "18:00" };
 

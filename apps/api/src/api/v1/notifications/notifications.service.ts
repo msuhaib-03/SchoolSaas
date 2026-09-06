@@ -1,4 +1,4 @@
-import { NotificationTriggerType, Prisma } from "@/generated/prisma";
+import { NotificationTriggerType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/app-error";
 import { toDateOnly } from "@/lib/school-calendar";

@@ -1,4 +1,4 @@
-import { Prisma } from "@/generated/prisma";
+import { Prisma } from "@prisma/client";
 import { AppError } from "./app-error";
 
 /** Maps a Prisma unique-constraint violation (P2002) to a 409 AppError; rethrows anything else. */
