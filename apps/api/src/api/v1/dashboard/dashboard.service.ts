@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { toDateOnly } from "@/lib/school-calendar";
+import { toDateOnly, todayInSchoolTimezone } from "@/lib/school-calendar";
 import { getTeacherSectionIds } from "@/lib/teacher-scope";
 import {
   AdmissionsQuery,
@@ -12,7 +12,7 @@ import {
 } from "./dashboard.validation";
 
 function currentPeriodLabel(): string {
-  const now = new Date();
+  const now = todayInSchoolTimezone();
   return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
@@ -36,7 +36,7 @@ function toMoney(value: Prisma.Decimal | number): number {
 }
 
 function todayDateOnly(): Date {
-  return toDateOnly(new Date());
+  return todayInSchoolTimezone();
 }
 
 function yesterdayDateOnly(): Date {
@@ -211,7 +211,7 @@ export async function getAttendanceByClass(schoolId: string, query: AttendanceBy
 // ---------- Fee trend (SCHOOL_ADMIN/PRINCIPAL/ACCOUNTANT) ----------
 
 export async function getFeeTrend(schoolId: string, query: FeeTrendQuery) {
-  const now = new Date();
+  const now = todayInSchoolTimezone();
   const periods: string[] = [];
   for (let i = query.months - 1; i >= 0; i--) {
     const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));

@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/app-error";
 import { getTeacherSectionIds } from "@/lib/teacher-scope";
-import { checkSchoolDay, toDateOnly } from "@/lib/school-calendar";
+import { checkSchoolDay, toDateOnly, todayInSchoolTimezone } from "@/lib/school-calendar";
 import { ensureDefaultAbsenceTemplate, resolveTemplate } from "@/lib/notification-template";
 import { assertCanSendNow } from "@/lib/notification-rules";
 import {
@@ -15,7 +15,7 @@ import {
 } from "./attendance.validation";
 
 function todayDateOnly(): Date {
-  return toDateOnly(new Date());
+  return todayInSchoolTimezone();
 }
 
 async function assertClassSectionBelongToSchool(schoolId: string, classId: string, sectionId: string) {

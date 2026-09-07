@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/app-error";
 import { toAppError } from "@/lib/prisma-errors";
 import { getOrCreateCurrentAcademicYear } from "@/lib/academic-year";
+import { todayInSchoolTimezone } from "@/lib/school-calendar";
 import { ensureDefaultTemplate, resolveTemplate } from "@/lib/notification-template";
 import { assertCanSendNow } from "@/lib/notification-rules";
 import {
@@ -15,7 +16,7 @@ import {
 } from "./fees.validation";
 
 function currentPeriodLabel(): string {
-  const now = new Date();
+  const now = todayInSchoolTimezone();
   return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 

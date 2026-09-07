@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 import { AppError } from "./app-error";
 import { NotificationTriggerType } from "@prisma/client";
+import { nowMinutesInSchoolTimezone } from "./school-calendar";
 
 const DEFAULT_WINDOW = { commsWindowStart: "07:00", commsWindowEnd: "18:00" };
 
@@ -43,9 +44,12 @@ function minutesSinceMidnight(hhmm: string): number {
  * WhatsApp-ing a parent at 11pm. The same NotificationRule the plan designed
  * for automatic scheduling doubles as a guardrail on manual sends: disabled
  * or outside the window blocks the button server-side, not just cosmetically.
- * Times are compared as plain HH:MM against server time — there's no
- * per-school timezone field yet, the same simplification used for "today" /
- * period-label handling elsewhere in this build.
+ * Times are compared as plain HH:MM against Pakistan local time (there's no
+ * per-school timezone field yet, so PKT is hardcoded — see school-calendar.ts).
+ * This used to compare against the server's raw UTC clock instead, which
+ * silently shifted the whole window 5 hours from the real Pakistan-time
+ * window it's named after (07:00-18:00) — blocking real mid-morning sends
+ * and, worse, waving through sends until 11pm local time.
  */
 export async function assertCanSendNow(schoolId: string, triggerType: NotificationTriggerType) {
   const rule = await getOrCreateRule(schoolId, triggerType);
@@ -53,8 +57,7 @@ export async function assertCanSendNow(schoolId: string, triggerType: Notificati
     throw AppError.badRequest(`${triggerType.replace("_", " ")} notifications are disabled for this school`);
   }
 
-  const now = new Date();
-  const nowMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+  const nowMinutes = nowMinutesInSchoolTimezone();
   const start = minutesSinceMidnight(rule.commsWindowStart);
   const end = minutesSinceMidnight(rule.commsWindowEnd);
 

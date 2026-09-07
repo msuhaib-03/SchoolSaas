@@ -10,6 +10,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { useClasses } from "@/features/classes/use-classes";
 import { useAttendanceRegister } from "@/features/attendance/use-attendance";
 import { cn } from "@/lib/cn";
+import { toLocalIsoDate } from "@/lib/format";
 import type { AttendanceStatus } from "@/types/attendance";
 
 const STATUS_LABEL: Record<AttendanceStatus, string> = {
@@ -29,7 +30,7 @@ const STATUS_CLASS: Record<AttendanceStatus, string> = {
 function isoDaysAgo(days: number) {
   const d = new Date();
   d.setDate(d.getDate() - days);
-  return d.toISOString().slice(0, 10);
+  return toLocalIsoDate(d);
 }
 
 export default function AttendanceRegisterPage() {

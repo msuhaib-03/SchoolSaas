@@ -15,6 +15,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { toastError, toastSuccess } from "@/store/toast-store";
 import { ApiError } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
+import { toLocalIsoDate } from "@/lib/format";
 import type { AttendanceStatus } from "@/types/attendance";
 
 const STATUS_OPTIONS: { value: AttendanceStatus; label: string }[] = [
@@ -32,7 +33,7 @@ const STATUS_STYLES: Record<AttendanceStatus, string> = {
 };
 
 function todayIso() {
-  return new Date().toISOString().slice(0, 10);
+  return toLocalIsoDate(new Date());
 }
 
 export default function MarkAttendancePage() {

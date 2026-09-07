@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/app-error";
-import { toDateOnly } from "@/lib/school-calendar";
+import { todayInSchoolTimezone } from "@/lib/school-calendar";
 import { resolveTemplate } from "@/lib/notification-template";
 import { AudiencePreviewQuery, CreateBroadcastInput, ListBroadcastsQuery } from "./broadcasts.validation";
 
@@ -12,7 +12,7 @@ type ResolvedRecipient = {
 };
 
 function currentPeriodLabel(): string {
-  const now = new Date();
+  const now = todayInSchoolTimezone();
   return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
@@ -53,7 +53,7 @@ async function resolveAudience(
     }
     studentWhere = { ...studentWhere, id: { in: filters.studentIds } };
   } else if (audienceType === "ABSENT_TODAY") {
-    const today = toDateOnly(new Date());
+    const today = todayInSchoolTimezone();
     studentWhere = {
       ...studentWhere,
       attendanceRecords: { some: { date: today, status: "ABSENT" } },

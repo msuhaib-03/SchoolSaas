@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { todayInSchoolTimezone } from "./school-calendar";
 
 /**
  * Fee structures are scoped to an academic year, but this MVP doesn't yet
@@ -15,8 +16,7 @@ export async function getOrCreateCurrentAcademicYear(schoolId: string) {
   });
   if (existing) return existing;
 
-  const now = new Date();
-  const year = now.getUTCFullYear();
+  const year = todayInSchoolTimezone().getUTCFullYear();
   return prisma.academicYear.create({
     data: {
       schoolId,
