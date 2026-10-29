@@ -36,6 +36,26 @@ export function nowMinutesInSchoolTimezone(): number {
   return pk.getUTCHours() * 60 + pk.getUTCMinutes();
 }
 
+/**
+ * The real UTC instant range covering "today" in Pakistan time — for
+ * filtering genuine timestamp columns (e.g. Payment.paidAt, an actual
+ * moment in time), NOT @db.Date columns. todayInSchoolTimezone() returns a
+ * UTC-midnight-*labeled* Date meant only for @db.Date comparisons — using
+ * that value directly as a timestamp boundary is wrong by exactly the PKT
+ * offset: a payment at 00:50 AM Pakistan time is a real UTC instant of
+ * 19:50 the previous day, which is *before* todayInSchoolTimezone()'s
+ * "00:00 UTC today" label — so it would be silently excluded from "today"
+ * for the first 5 hours of every Pakistan calendar day. This helper
+ * subtracts the offset back out to get the real instant PKT midnight
+ * actually falls at.
+ */
+export function todayRangeInSchoolTimezone(): { start: Date; end: Date } {
+  const dateLabel = todayInSchoolTimezone();
+  const start = new Date(dateLabel.getTime() - PKT_OFFSET_MINUTES * 60_000);
+  const end = new Date(start.getTime() + 24 * 60 * 60_000);
+  return { start, end };
+}
+
 /** Returns { isSchoolDay, reason } — the Mark Attendance screen shouldn't render a roster otherwise. */
 export async function checkSchoolDay(
   schoolId: string,

@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { toDateOnly, todayInSchoolTimezone } from "@/lib/school-calendar";
+import { toDateOnly, todayInSchoolTimezone, todayRangeInSchoolTimezone } from "@/lib/school-calendar";
 import { getTeacherSectionIds } from "@/lib/teacher-scope";
 import {
   AdmissionsQuery,
@@ -282,9 +282,10 @@ export async function getAlerts(schoolId: string, query: AlertsQuery) {
     }
   }
 
-  // 3. WhatsApp delivery failures today.
+  // 3. WhatsApp delivery failures today. updatedAt is a real timestamp, not
+  // a @db.Date column, so this needs the real-instant range, not `today`.
   const failedToday = await prisma.messageDelivery.count({
-    where: { status: "FAILED", updatedAt: { gte: today } },
+    where: { status: "FAILED", updatedAt: { gte: todayRangeInSchoolTimezone().start } },
   });
   if (failedToday > 0) {
     alerts.push({
@@ -339,8 +340,9 @@ export async function getClassStrength(schoolId: string) {
 // ---------- Today's fee collection (SCHOOL_ADMIN/PRINCIPAL/ACCOUNTANT) ----------
 
 export async function getTodayCollections(schoolId: string, query: TodayCollectionsQuery) {
-  const start = todayDateOnly();
-  const end = new Date(start.getTime() + 86_400_000);
+  // paidAt is a real timestamp, not a @db.Date column — needs the real
+  // UTC-instant range for Pakistan's "today", not the @db.Date-style label.
+  const { start, end } = todayRangeInSchoolTimezone();
 
   const payments = await prisma.payment.findMany({
     where: {
